@@ -1,0 +1,198 @@
+[
+ {
+  "file": "blender_01.png",
+  "edge": 2880,
+  "ms": 2496,
+  "n_text": 22,
+  "found": {}
+ },
+ {
+  "file": "blender_01.png",
+  "edge": 1280,
+  "ms": 2333,
+  "n_text": 23,
+  "found": {}
+ },
+ {
+  "file": "blender_02.png",
+  "edge": 2880,
+  "ms": 2327,
+  "n_text": 20,
+  "found": {}
+ },
+ {
+  "file": "blender_02.png",
+  "edge": 1280,
+  "ms": 2170,
+  "n_text": 21,
+  "found": {}
+ },
+ {
+  "file": "blender_03.png",
+  "edge": 2880,
+  "ms": 2568,
+  "n_text": 27,
+  "found": {
+   "Object": {
+    "score": 92,
+    "norm_box": [
+     299,
+     970,
+     346,
+     991
+    ],
+    "px_center": [
+     929,
+     1684
+    ]
+   }
+  }
+ },
+ {
+  "file": "blender_03.png",
+  "edge": 1280,
+  "ms": 2482,
+  "n_text": 27,
+  "found": {
+   "Object": {
+    "score": 92,
+    "norm_box": [
+     299,
+     970,
+     347,
+     992
+    ],
+    "px_center": [
+     930,
+     1685
+    ]
+   }
+  }
+ },
+ {
+  "file": "blender_04.png",
+  "edge": 2880,
+  "ms": 2154,
+  "n_text": 20,
+  "found": {}
+ },
+ {
+  "file": "blender_04.png",
+  "edge": 1280,
+  "ms": 2220,
+  "n_text": 17,
+  "found": {}
+ },
+ {
+  "file": "blender_05.png",
+  "edge": 2880,
+  "ms": 2310,
+  "n_text": 20,
+  "found": {}
+ },
+ {
+  "file": "blender_05.png",
+  "edge": 1280,
+  "ms": 2062,
+  "n_text": 17,
+  "found": {}
+ },
+ {
+  "file": "blender_06.png",
+  "edge": 2880,
+  "ms": 2580,
+  "n_text": 29,
+  "found": {}
+ },
+ {
+  "file": "blender_06.png",
+  "edge": 1280,
+  "ms": 2400,
+  "n_text": 27,
+  "found": {}
+ },
+ {
+  "file": "blender_07.png",
+  "edge": 2876,
+  "ms": 1867,
+  "n_text": 12,
+  "found": {}
+ },
+ {
+  "file": "blender_07.png",
+  "edge": 1280,
+  "ms": 1887,
+  "n_text": 11,
+  "found": {}
+ },
+ {
+  "file": "blender_08.png",
+  "edge": 2878,
+  "ms": 2096,
+  "n_text": 21,
+  "found": {
+   "Object Mode": {
+    "score": 96,
+    "norm_box": [
+     8,
+     61,
+     108,
+     85
+    ],
+    "px_center": [
+     167,
+     122
+    ]
+   }
+  }
+ },
+ {
+  "file": "blender_08.png",
+  "edge": 1280,
+  "ms": 1992,
+  "n_text": 18,
+  "found": {
+   "Object Mode": {
+    "score": 96,
+    "norm_box": [
+     8,
+     61,
+     109,
+     85
+    ],
+    "px_center": [
+     168,
+     122
+    ]
+   }
+  }
+ },
+ {
+  "file": "blender_09.png",
+  "edge": 2880,
+  "ms": 2188,
+  "n_text": 30,
+  "found": {}
+ },
+ {
+  "file": "blender_09.png",
+  "edge": 1280,
+  "ms": 2314,
+  "n_text": 29,
+  "found": {}
+ },
+ {
+  "file": "blender_10.png",
+  "edge": 2880,
+  "ms": 2185,
+  "n_text": 30,
+  "found": {}
+ },
+ {
+  "file": "blender_10.png",
+  "edge": 1280,
+  "ms": 2186,
+  "n_text": 30,
+  "found": {}
+ }
+]

@@ -1,0 +1,90 @@
+{
+  "id": "blender-005-camera-light",
+  "title": "Add a light and a camera",
+  "tool": "blender",
+  "skills_taught": [
+    "add-camera-light"
+  ],
+  "prereqs": [
+    "add-mesh"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "instruction": "Open the Add menu.",
+      "spoken": "Open the Add menu. Lights live there too.",
+      "why": "Everything in a scene, even a light, is an object you add.",
+      "target": {
+        "text": "Add"
+      },
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Metaball"
+      },
+      "docs_query": "add light object",
+      "hint_if_stuck": "The Add menu is in the bar above the 3D view."
+    },
+    {
+      "id": "s2",
+      "instruction": "Choose Light.",
+      "spoken": "Choose Light to see the kinds of light.",
+      "why": "Point lights glow in every direction, like a bulb. Sun lights shine in parallel, like daylight.",
+      "target": {
+        "text": "Light"
+      },
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Point"
+      },
+      "docs_query": "light types point sun spot area",
+      "hint_if_stuck": "Light is near the middle of the Add menu, with an arrow on its right."
+    },
+    {
+      "id": "s3",
+      "instruction": "Choose Point.",
+      "spoken": "Choose Point. A new light appears in your scene.",
+      "why": "More lights mean more control over how the scene looks.",
+      "target": {
+        "text": "Point"
+      },
+      "check": {
+        "kind": "blender_state",
+        "object_count_at_least": 4,
+        "fallback_text": "Point"
+      },
+      "docs_query": "point light",
+      "hint_if_stuck": "Point is the first item in the Light list."
+    },
+    {
+      "id": "s4",
+      "instruction": "Open the Add menu again.",
+      "spoken": "Open the Add menu again. This time we add a camera.",
+      "why": "The camera decides what your final picture shows.",
+      "target": {
+        "text": "Add"
+      },
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Speaker"
+      },
+      "docs_query": "add camera",
+      "hint_if_stuck": "The Add menu is in the bar above the 3D view."
+    },
+    {
+      "id": "s5",
+      "instruction": "Choose Camera.",
+      "spoken": "Choose Camera. You now have a second camera in the scene.",
+      "why": "A scene can hold many cameras, but only one is active at a time.",
+      "target": {
+        "text": "Camera"
+      },
+      "check": {
+        "kind": "blender_state",
+        "object_count_at_least": 5,
+        "fallback_text": "Camera.001"
+      },
+      "docs_query": "camera object",
+      "hint_if_stuck": "Camera is in the middle of the Add menu, below Light Probe."
+    }
+  ]
+}

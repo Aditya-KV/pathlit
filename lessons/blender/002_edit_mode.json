@@ -1,0 +1,50 @@
+{
+  "id": "blender-002-edit-mode",
+  "title": "Switch between Object and Edit mode",
+  "tool": "blender",
+  "skills_taught": ["mode-switching"],
+  "prereqs": ["add-mesh"],
+  "steps": [
+    {
+      "id": "s1",
+      "instruction": "Select your object, then open the mode menu that says Object Mode.",
+      "spoken": "Click your object first. Then open the menu that says Object Mode.",
+      "why": "Blender has different modes for different jobs, like tools in a toolbox.",
+      "target": { "text": "Object Mode" },
+      "shortcut": "Tab",
+      "check": { "kind": "screen_text_present", "text": "Edit Mode" },
+      "docs_query": "Edit mode and object mode",
+      "hint_if_stuck": "The mode menu is the first dropdown on the left of the 3D view header."
+    },
+    {
+      "id": "s2",
+      "instruction": "Choose Edit Mode.",
+      "spoken": "Choose Edit Mode. Now you can change the shape itself, point by point.",
+      "why": "Object mode moves the whole object. Edit mode changes its shape.",
+      "target": { "text": "Edit Mode" },
+      "check": { "kind": "blender_state", "mode": "EDIT_MESH", "fallback_text": "Vertex" },
+      "docs_query": "Edit mode mesh",
+      "hint_if_stuck": "Edit Mode is the second item in the list. You can also press Tab."
+    },
+    {
+      "id": "s3",
+      "instruction": "Open the mode menu again.",
+      "spoken": "Open the mode menu again. It now says Edit Mode.",
+      "why": "You should always know which mode you are in before you change something.",
+      "target": { "text": "Edit Mode" },
+      "check": { "kind": "screen_text_present", "text": "Object Mode" },
+      "docs_query": "Object mode",
+      "hint_if_stuck": "The same dropdown, still on the left of the 3D view header."
+    },
+    {
+      "id": "s4",
+      "instruction": "Choose Object Mode to go back.",
+      "spoken": "Choose Object Mode to go back to moving the whole object.",
+      "why": "Pressing Tab does the same thing, and it is much faster.",
+      "target": { "text": "Object Mode" },
+      "check": { "kind": "blender_state", "mode": "OBJECT", "fallback_text": "Object Mode" },
+      "docs_query": "Object mode",
+      "hint_if_stuck": "Object Mode is the first item in the list."
+    }
+  ]
+}

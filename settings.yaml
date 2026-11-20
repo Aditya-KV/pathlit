@@ -1,0 +1,30 @@
+hotkey: f8             # F9 is Blender's "Adjust Last Operation"; confirm F8 is free in the live demo
+stop_key: esc
+match_min: 80          # out of 100, tune after Phase 0
+arrow_seconds: 15
+blender_port: 8765
+blender_timeout_s: 1
+model_image_max_edge: 1280
+vision_max_edge: 2048  # longest edge sent to Azure Vision (0 = real pixels). 2048 read in ~0.9 s vs ~1.7 s at full size, same 16/16 targets found
+voice: en-US-JennyNeural
+session_csv: logs/session.csv
+provider: groq              # groq | none (lesson text only). Azure OpenAI is unavailable on the student account.
+teacher_timeout_s: 6
+session_token_cap: 60000    # PROVISIONAL: set from real measurements; above this the app uses lesson text only
+docs_top_k: 3
+lessons_dir: lessons/blender
+skillmap_db: data/skillmap.db
+mirage_fallback: true       # local Mirage reads the screen if Azure Vision fails (offline resilience)
+auto_advance: true          # follow the learner's clicks and key presses in Blender (the hotkey starts a lesson)
+auto_settle_s: 0.25         # wait this long after a click so menus finish opening (a click on the pointed target uses fast_settle_s)
+idle_hint_s: 20             # if the learner stops without finishing a step, explain it again after this many seconds
+auto_window_title: Blender  # only look at the screen when a window with this in its title has the focus
+fast_settle_s: 0.1
+second_look_s: 0.8          # if the step is not done at the first look, look once more after this long
+plan_timeout_s: 40          # time allowed for the model to plan a typed task
+mode: teach                 # teach | show | do. Show me and Do it move the real mouse (see docs/do_mode.md)
+allowed_apps: [Blender]     # cursor control only when the window in front has one of these in its title
+action_delay_s: 1.0         # countdown before each action in Do it mode
+max_actions_per_task: 40
+mouse_move_s: 0.6           # how long one cursor move takes
+mouse_abort_px: 50          # stop if you move the real mouse more than this during an action

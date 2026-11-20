@@ -1,0 +1,51 @@
+{
+  "id": "blender-006-duplicate",
+  "title": "Duplicate and delete objects",
+  "tool": "blender",
+  "skills_taught": ["duplicate-objects"],
+  "prereqs": ["add-mesh"],
+  "steps": [
+    {
+      "id": "s1",
+      "instruction": "Select an object, then open the Object menu.",
+      "spoken": "Click an object to select it. Then open the Object menu.",
+      "why": "Blender acts on whatever is selected, so selecting comes first.",
+      "target": { "text": "Object" },
+      "check": { "kind": "screen_text_present", "text": "Duplicate Objects" },
+      "docs_query": "object menu duplicate",
+      "hint_if_stuck": "The Object menu is in the bar above the 3D view, after Add."
+    },
+    {
+      "id": "s2",
+      "instruction": "Click Duplicate Objects, move the mouse, then click to place the copy.",
+      "spoken": "Click Duplicate Objects. Move the mouse and click to drop the copy.",
+      "why": "A duplicate is a photocopy you can then change on its own.",
+      "target": { "text": "Duplicate Objects" },
+      "shortcut": "Shift D",
+      "check": { "kind": "blender_state", "object_count_at_least": 4, "fallback_text": "Cube.001" },
+      "docs_query": "duplicate objects",
+      "hint_if_stuck": "After you click Duplicate Objects the copy sticks to the mouse. Click once to put it down."
+    },
+    {
+      "id": "s3",
+      "instruction": "Open the Object menu again.",
+      "spoken": "Open the Object menu again. We will delete the copy.",
+      "why": "Deleting is safe in Blender. You can always undo with Control Z.",
+      "target": { "text": "Object" },
+      "check": { "kind": "screen_text_present", "text": "Delete" },
+      "docs_query": "delete objects",
+      "hint_if_stuck": "The Object menu is in the bar above the 3D view."
+    },
+    {
+      "id": "s4",
+      "instruction": "Click Delete.",
+      "spoken": "Click Delete. The selected copy disappears.",
+      "why": "Only the selected object is removed, so check the selection first.",
+      "target": { "text": "Delete" },
+      "shortcut": "X",
+      "check": { "kind": "none" },
+      "docs_query": "delete objects",
+      "hint_if_stuck": "Delete is near the bottom of the Object menu."
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "id": "blender-007-properties",
+  "title": "Read the Object properties",
+  "tool": "blender",
+  "skills_taught": [
+    "properties-panel"
+  ],
+  "prereqs": [],
+  "steps": [
+    {
+      "id": "s1",
+      "instruction": "Select an object. In the Properties panel on the right, find the Transform section.",
+      "spoken": "Click an object. Then look at the panel on the right for the section called Transform.",
+      "why": "Transform holds the position, turning and size of the selected object.",
+      "target": {
+        "text": "Transform"
+      },
+      "check": {
+        "kind": "none"
+      },
+      "docs_query": "object properties transform",
+      "hint_if_stuck": "Click the orange square icon in the Properties panel if you do not see Transform.",
+      "do": {
+        "click": false
+      }
+    },
+    {
+      "id": "s2",
+      "instruction": "Find Location. It tells you where the object is.",
+      "spoken": "Location tells you where the object is. X is left and right, Y is forward and back, Z is up and down.",
+      "why": "Three numbers are enough to place anything in 3D space.",
+      "target": {
+        "text": "Location"
+      },
+      "check": {
+        "kind": "none"
+      },
+      "docs_query": "location X Y Z",
+      "hint_if_stuck": "Location is the first group of three boxes under Transform.",
+      "do": {
+        "click": false
+      }
+    },
+    {
+      "id": "s3",
+      "instruction": "Find Rotation. It tells you how the object is turned.",
+      "spoken": "Rotation shows how much the object is turned, in degrees.",
+      "why": "A turn around each of the three directions can point an object anywhere.",
+      "target": {
+        "text": "Rotation"
+      },
+      "check": {
+        "kind": "none"
+      },
+      "docs_query": "rotation euler",
+      "hint_if_stuck": "Rotation is the second group, below Location.",
+      "do": {
+        "click": false
+      }
+    },
+    {
+      "id": "s4",
+      "instruction": "Find Scale. A value of 1 means normal size.",
+      "spoken": "Scale shows the size. One means normal. Two means twice as big.",
+      "why": "Changing scale stretches the object, like pulling a rubber band.",
+      "target": {
+        "text": "Scale"
+      },
+      "check": {
+        "kind": "none"
+      },
+      "docs_query": "scale transform",
+      "hint_if_stuck": "Scale is the third group, below Rotation.",
+      "do": {
+        "click": false
+      }
+    }
+  ]
+}

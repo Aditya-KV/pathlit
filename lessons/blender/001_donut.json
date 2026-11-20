@@ -1,0 +1,179 @@
+{
+  "id": "blender-001-donut",
+  "title": "Model a donut",
+  "tool": "blender",
+  "skills_taught": [
+    "add-mesh",
+    "shade-smooth",
+    "modifier-subsurf"
+  ],
+  "prereqs": [],
+  "steps": [
+    {
+      "id": "s1",
+      "instruction": "Open the Add menu at the top of the 3D view.",
+      "spoken": "Let's start with the donut shape. Open the Add menu.",
+      "why": "Every new object in Blender starts from the Add menu.",
+      "target": {
+        "text": "Add"
+      },
+      "shortcut": "Shift A",
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Mesh"
+      },
+      "docs_query": "Add menu mesh objects",
+      "hint_if_stuck": "The Add menu is in the bar above the 3D view, next to Select.",
+      "do": {
+        "skip_in_do": true
+      }
+    },
+    {
+      "id": "s2",
+      "instruction": "Click Mesh.",
+      "spoken": "Now click Mesh.",
+      "why": "Meshes are solid shapes made of faces, like a cube or a ring.",
+      "target": {
+        "text": "Mesh"
+      },
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Torus"
+      },
+      "docs_query": "Add mesh primitives",
+      "hint_if_stuck": "Mesh is the first item in the Add menu.",
+      "do": {
+        "skip_in_do": true
+      }
+    },
+    {
+      "id": "s3",
+      "instruction": "Click Torus.",
+      "spoken": "Pick Torus. That ring is our donut.",
+      "why": "A torus is a ring shape, which is what a donut is.",
+      "target": {
+        "text": "Torus"
+      },
+      "check": {
+        "kind": "blender_state",
+        "active_object_name_contains": "Torus",
+        "fallback_text": "Torus"
+      },
+      "docs_query": "Add torus mesh",
+      "hint_if_stuck": "Torus is in the list that opened next to Mesh.",
+      "do": {
+        "direct": {
+          "action": "add_primitive",
+          "args": {
+            "type": "TORUS"
+          }
+        }
+      }
+    },
+    {
+      "id": "s4",
+      "instruction": "Open the Object menu.",
+      "spoken": "The donut looks blocky. Open the Object menu to smooth it.",
+      "why": "Shading controls how light slides over the surface, so a round shape looks round.",
+      "target": {
+        "text": "Object"
+      },
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Shade Smooth"
+      },
+      "docs_query": "Object menu shade smooth",
+      "hint_if_stuck": "The Object menu is in the bar above the 3D view, right after Add."
+    },
+    {
+      "id": "s5",
+      "instruction": "Click Shade Smooth.",
+      "spoken": "Click Shade Smooth. The harsh edges blend away.",
+      "why": "Think of it like sanding a wooden shape until it feels smooth.",
+      "target": {
+        "text": "Shade Smooth"
+      },
+      "check": {
+        "kind": "none"
+      },
+      "docs_query": "Shade Smooth",
+      "hint_if_stuck": "Shade Smooth is in the middle of the Object menu, above Shade Flat."
+    },
+    {
+      "id": "s6",
+      "instruction": "In the Properties panel on the right, click the blue wrench icon (the Modifiers tab).",
+      "spoken": "Now find the blue wrench icon in the panel on the right. That is the Modifiers tab.",
+      "why": "Modifiers change a shape without destroying it, so you can undo them any time.",
+      "target": null,
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Add Modifier"
+      },
+      "docs_query": "Modifiers tab properties editor",
+      "hint_if_stuck": "The wrench is in the column of small icons on the right edge, below the orange square.",
+      "do": {
+        "skip_in_do": true
+      }
+    },
+    {
+      "id": "s7",
+      "instruction": "Click Add Modifier.",
+      "spoken": "Click Add Modifier to see the list of effects.",
+      "why": "This is the shop window for all of Blender's shape effects.",
+      "target": {
+        "text": "Add Modifier"
+      },
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Generate"
+      },
+      "docs_query": "Add Modifier menu generate",
+      "hint_if_stuck": "Add Modifier is the wide button at the top of the Modifiers tab.",
+      "do": {
+        "skip_in_do": true
+      }
+    },
+    {
+      "id": "s8",
+      "instruction": "Click Generate.",
+      "spoken": "Click Generate.",
+      "why": "Generate modifiers build new geometry from your shape.",
+      "target": {
+        "text": "Generate"
+      },
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Subdivision Surface"
+      },
+      "docs_query": "Generate modifiers",
+      "hint_if_stuck": "Generate is the second group in the list.",
+      "do": {
+        "skip_in_do": true
+      }
+    },
+    {
+      "id": "s9",
+      "instruction": "Click Subdivision Surface.",
+      "spoken": "Pick Subdivision Surface. It rounds the donut off nicely.",
+      "why": "It adds extra detail so blocky shapes become soft, like pressing clay into a ball.",
+      "target": {
+        "text": "Subdivision Surface"
+      },
+      "check": {
+        "kind": "blender_state",
+        "modifier_present": "SUBSURF",
+        "fallback_text": "Subdivision"
+      },
+      "docs_query": "Subdivision Surface modifier",
+      "hint_if_stuck": "Subdivision Surface is in the list that opened next to Generate.",
+      "do": {
+        "direct": {
+          "action": "add_modifier",
+          "args": {
+            "type": "SUBSURF"
+          }
+        }
+      }
+    }
+  ]
+}

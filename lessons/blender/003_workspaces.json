@@ -1,0 +1,39 @@
+{
+  "id": "blender-003-workspaces",
+  "title": "Move between workspaces",
+  "tool": "blender",
+  "skills_taught": ["workspaces"],
+  "prereqs": [],
+  "steps": [
+    {
+      "id": "s1",
+      "instruction": "Click the Sculpting tab at the top of the window.",
+      "spoken": "Look at the tabs at the top. Click Sculpting.",
+      "why": "A workspace is a ready-made desk layout for one kind of job.",
+      "target": { "text": "Sculpting" },
+      "check": { "kind": "blender_state", "mode": "SCULPT", "fallback_text": "Dyntopo" },
+      "docs_query": "workspaces tabs",
+      "hint_if_stuck": "The tabs run across the top, between Modeling and UV Editing."
+    },
+    {
+      "id": "s2",
+      "instruction": "Click the Shading tab.",
+      "spoken": "Now click Shading. This desk is set up for materials and colour.",
+      "why": "Switching workspace changes the screen layout, not your scene.",
+      "target": { "text": "Shading" },
+      "check": { "kind": "screen_text_present", "text": "Use Nodes" },
+      "docs_query": "Shading workspace",
+      "hint_if_stuck": "Shading is a few tabs to the right of Texture Paint."
+    },
+    {
+      "id": "s3",
+      "instruction": "Click the Layout tab to come back.",
+      "spoken": "Last one. Click Layout to come back to the normal view.",
+      "why": "Layout is the home desk where most beginners work.",
+      "target": { "text": "Layout" },
+      "check": { "kind": "screen_text_present", "text": "Playback" },
+      "docs_query": "workspaces layout",
+      "hint_if_stuck": "Layout is the first tab on the left of the top bar."
+    }
+  ]
+}

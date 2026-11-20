@@ -1,0 +1,60 @@
+{
+  "id": "blender-008-render-settings",
+  "title": "Find the render settings",
+  "tool": "blender",
+  "skills_taught": [
+    "render-engine"
+  ],
+  "prereqs": [
+    "add-camera-light"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "instruction": "In the Properties panel on the right, click the Render tab (the camera-back icon, second from the top).",
+      "spoken": "In the column of small icons on the right, click the second one. It looks like the back of a camera.",
+      "why": "Render settings control how your final picture is made.",
+      "target": null,
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Render Engine"
+      },
+      "docs_query": "render properties",
+      "hint_if_stuck": "It is the second icon from the top, under the tools icon."
+    },
+    {
+      "id": "s2",
+      "instruction": "Look at Render Engine. This is the program that draws your picture.",
+      "spoken": "Render Engine is the artist that paints your picture. EEVEE is fast, Cycles is slower but more realistic.",
+      "why": "Fast engines are good for previews. Realistic engines are good for final images.",
+      "target": {
+        "text": "Render Engine"
+      },
+      "check": {
+        "kind": "none"
+      },
+      "docs_query": "render engine eevee cycles",
+      "hint_if_stuck": "Render Engine is the first setting at the top of the Render tab.",
+      "do": {
+        "click": false
+      }
+    },
+    {
+      "id": "s3",
+      "instruction": "Find Sampling. More samples means a cleaner picture but a longer wait.",
+      "spoken": "Sampling is how many times Blender looks at each dot. More looks give a cleaner picture but take longer.",
+      "why": "It is a trade between quality and waiting time.",
+      "target": {
+        "text": "Sampling"
+      },
+      "check": {
+        "kind": "none"
+      },
+      "docs_query": "sampling render samples",
+      "hint_if_stuck": "Sampling is the first section under Render Engine.",
+      "do": {
+        "click": false
+      }
+    }
+  ]
+}

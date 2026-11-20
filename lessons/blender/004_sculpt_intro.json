@@ -1,0 +1,92 @@
+{
+  "id": "blender-004-sculpt-intro",
+  "title": "Your first look at Sculpt mode",
+  "tool": "blender",
+  "skills_taught": [
+    "sculpt-mode"
+  ],
+  "prereqs": [
+    "mode-switching"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "instruction": "Open the mode menu that says Object Mode.",
+      "spoken": "Open the mode menu that says Object Mode.",
+      "why": "Sculpt mode is another mode, like Edit mode, with its own tools.",
+      "target": {
+        "text": "Object Mode"
+      },
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Sculpt Mode"
+      },
+      "docs_query": "sculpt mode",
+      "hint_if_stuck": "It is the first dropdown on the left of the 3D view header."
+    },
+    {
+      "id": "s2",
+      "instruction": "Choose Sculpt Mode.",
+      "spoken": "Choose Sculpt Mode. Your mouse becomes a clay brush.",
+      "why": "Sculpting pushes and pulls the surface like pressing your thumb into clay.",
+      "target": {
+        "text": "Sculpt Mode"
+      },
+      "check": {
+        "kind": "blender_state",
+        "mode": "SCULPT",
+        "fallback_text": "Dyntopo"
+      },
+      "docs_query": "sculpt mode brush",
+      "hint_if_stuck": "Sculpt Mode is in the list under Edit Mode."
+    },
+    {
+      "id": "s3",
+      "instruction": "Find the Radius setting in the top bar. It sets how big the brush is.",
+      "spoken": "Look at the top bar. Radius is the size of your brush, and Strength is how hard it presses.",
+      "why": "A big, light brush shapes the whole form. A small, strong one adds detail.",
+      "target": {
+        "text": "Radius"
+      },
+      "check": {
+        "kind": "none"
+      },
+      "docs_query": "sculpt brush radius strength",
+      "hint_if_stuck": "Radius is the first slider after the SculptDraw brush name.",
+      "do": {
+        "click": false
+      }
+    },
+    {
+      "id": "s4",
+      "instruction": "Open the mode menu that now says Sculpt Mode.",
+      "spoken": "Open the mode menu that now says Sculpt Mode.",
+      "why": "Always return to Object mode when you finish so nothing is changed by accident.",
+      "target": {
+        "text": "Sculpt Mode"
+      },
+      "check": {
+        "kind": "screen_text_present",
+        "text": "Object Mode"
+      },
+      "docs_query": "object mode",
+      "hint_if_stuck": "It is the first dropdown on the left of the 3D view header."
+    },
+    {
+      "id": "s5",
+      "instruction": "Choose Object Mode.",
+      "spoken": "Choose Object Mode to leave sculpting.",
+      "why": "Object mode is the safe home base.",
+      "target": {
+        "text": "Object Mode"
+      },
+      "check": {
+        "kind": "blender_state",
+        "mode": "OBJECT",
+        "fallback_text": "Add"
+      },
+      "docs_query": "object mode",
+      "hint_if_stuck": "Object Mode is the first item in the list."
+    }
+  ]
+}

@@ -1,0 +1,318 @@
+{
+  "image": "a Blender 4.1 screenshot (Add menu open)",
+  "size": [
+    2880,
+    1710
+  ],
+  "note": "Raw Mirage output for sections=['text']. bbox is [x1, y1, x2, y2] normalised to 0-1000. Replaces the Phase 0 sample that was taken from a live desktop.",
+  "probes": {
+    "sections=text": {
+      "ms": 6460,
+      "error": null,
+      "result": {
+        "text": [
+          {
+            "string": "(Unsaved) - Blender 4.1",
+            "bbox": [
+              5,
+              3,
+              104,
+              25
+            ],
+            "score": 0.366
+          },
+          {
+            "string": " GlobalO",
+            "bbox": [
+              322,
+              58,
+              473,
+              86
+            ],
+            "score": 0.34
+          },
+          {
+            "string": "LX",
+            "bbox": [
+              965,
+              27,
+              992,
+              52
+            ],
+            "score": 0.428
+          },
+          {
+            "string": "+",
+            "bbox": [
+              6,
+              173,
+              31,
+              203
+            ],
+            "score": 0.454
+          },
+          {
+            "string": "TA",
+            "bbox": [
+              8,
+              88,
+              72,
+              114
+            ],
+            "score": 0.511
+          },
+          {
+            "string": "(1) Collection |cCube",
+            "bbox": [
+              45,
+              142,
+              120,
+              167
+            ],
+            "score": 0.382
+          },
+          {
+            "string": "aText",
+            "bbox": [
+              178,
+              181,
+              215,
+              205
+            ],
+            "score": 0.456
+          },
+          {
+            "string": "Options",
+            "bbox": [
+              777,
+              93,
+              821,
+              114
+            ],
+            "score": 0.413
+          },
+          {
+            "string": "Scene Collectio",
+            "bbox": [
+              846,
+              89,
+              917,
+              117
+            ],
+            "score": 0.327
+          },
+          {
+            "string": "O",
+            "bbox": [
+              953,
+              109,
+              995,
+              134
+            ],
+            "score": 0.426
+          },
+          {
+            "string": "O",
+            "bbox": [
+              967,
+              182,
+              992,
+              202
+            ],
+            "score": 0.371
+          },
+          {
+            "string": "+",
+            "bbox": [
+              12,
+              267,
+              26,
+              289
+            ],
+            "score": 0.358
+          },
+          {
+            "string": "Lattice",
+            "bbox": [
+              177,
+              280,
+              220,
+              306
+            ],
+            "score": 0.448
+          },
+          {
+            "string": "S Grease Penci",
+            "bbox": [
+              179,
+              229,
+              244,
+              252
+            ],
+            "score": 0.467
+          },
+          {
+            "string": "+",
+            "bbox": [
+              801,
+              226,
+              820,
+              252
+            ],
+            "score": 0.367
+          },
+          {
+            "string": "C",
+            "bbox": [
+              12,
+              345,
+              27,
+              369
+            ],
+            "score": 0.337
+          },
+          {
+            "string": "Ligh",
+            "bbox": [
+              180,
+              366,
+              211,
+              394
+            ],
+            "score": 0.535
+          },
+          {
+            "string": "Empt",
+            "bbox": [
+              179,
+              318,
+              217,
+              349
+            ],
+            "score": 0.477
+          },
+          {
+            "string": "E",
+            "bbox": [
+              7,
+              477,
+              30,
+              512
+            ],
+            "score": 0.441
+          },
+          {
+            "string": "Speaker",
+            "bbox": [
+              180,
+              458,
+              230,
+              479
+            ],
+            "score": 0.441
+          },
+          {
+            "string": "*",
+            "bbox": [
+              399,
+              457,
+              427,
+              506
+            ],
+            "score": 0.361
+          },
+          {
+            "string": "ECollection Instance",
+            "bbox": [
+              178,
+              519,
+              269,
+              541
+            ],
+            "score": 0.598
+          },
+          {
+            "string": ">Motion Blur",
+            "bbox": [
+              855,
+              756,
+              919,
+              780
+            ],
+            "score": 0.481
+          },
+          {
+            "string": "Screen Space Reflectior",
+            "bbox": [
+              860,
+              725,
+              965,
+              749
+            ],
+            "score": 0.331
+          },
+          {
+            "string": "Shadows",
+            "bbox": [
+              860,
+              883,
+              905,
+              905
+            ],
+            "score": 0.532
+          },
+          {
+            "string": "Performance",
+            "bbox": [
+              859,
+              819,
+              916,
+              842
+            ],
+            "score": 0.536
+          },
+          {
+            "string": "IKCI",
+            "bbox": [
+              373,
+              907,
+              462,
+              931
+            ],
+            "score": 0.644
+          },
+          {
+            "string": "Film",
+            "bbox": [
+              857,
+              945,
+              883,
+              967
+            ],
+            "score": 0.39
+          },
+          {
+            "string": ">Indirect Lighting",
+            "bbox": [
+              858,
+              914,
+              930,
+              939
+            ],
+            "score": 0.406
+          },
+          {
+            "string": "4.1.1",
+            "bbox": [
+              969,
+              972,
+              996,
+              994
+            ],
+            "score": 0.441
+          }
+        ]
+      }
+    }
+  }
+}
