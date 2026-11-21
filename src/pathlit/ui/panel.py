@@ -980,6 +980,8 @@ class PathlitPanel(QWidget):
     def _build_rows(self, steps: list[str]) -> None:
         for r in self._rows:
             self.steps_lay.removeWidget(r)
+            r.hide()                                           # gone at once, not at the next event-loop pass
+            r.setParent(None)
             r.deleteLater()
         self._rows = []
         for i, text in enumerate(steps):

@@ -3,29 +3,36 @@
 **An AI teacher that sits next to your cursor in Blender.** It points at the next thing to click, speaks one short line, and checks that
 you really did it before moving on. If you prefer, it can also click for you.
 
+![Pathlit teaching Blender: a pointer on the Mesh item, a speech bubble and the control panel](docs/images/demo_teach.jpg)
+
 > Pathlit teaches Blender 4.1 on Windows. It was built as a course project (Microsoft AI-901 topics) under the working name *Shifu*.
-> Status: working prototype. See [Project status](#project-status) for what is measured, and what is not yet.
+> Status: working prototype. See [Project status](#project-status) for what is measured and what is not yet.
+>
+> *The picture above is the real pointer, bubble and control panel drawn over a Blender-only screenshot
+> (see [Demo](#demo) for how the pictures are made).*
 
 ---
 
 ## Contents
 1. [What it does](#what-it-does)
-2. [Three modes](#three-modes)
-3. [How it works](#how-it-works)
-4. [Quick start](#quick-start)
-5. [Configuration](#configuration)
-6. [Using Pathlit](#using-pathlit)
-7. [Typed tasks ("build a house")](#typed-tasks-build-a-house)
-8. [Show me and Do it: the safety model](#show-me-and-do-it-the-safety-model)
-9. [Privacy](#privacy)
-10. [Command reference](#command-reference)
-11. [Testing and evaluation](#testing-and-evaluation)
-12. [Project status](#project-status)
-13. [Troubleshooting](#troubleshooting)
-14. [Project layout](#project-layout)
-15. [Design decisions](#design-decisions)
-16. [Limitations](#limitations)
-17. [Credits and licences](#credits-and-licences)
+2. [Demo](#demo)
+3. [Three modes](#three-modes)
+4. [Architecture](#architecture)
+5. [How Pathlit uses Azure](#how-pathlit-uses-azure)
+6. [Quick start](#quick-start)
+7. [Configuration](#configuration)
+8. [Using Pathlit](#using-pathlit)
+9. [Typed tasks ("build a house")](#typed-tasks-build-a-house)
+10. [Show me and Do it: the safety model](#show-me-and-do-it-the-safety-model)
+11. [Privacy](#privacy)
+12. [Command reference](#command-reference)
+13. [Testing and evaluation](#testing-and-evaluation)
+14. [Project status](#project-status)
+15. [Troubleshooting](#troubleshooting)
+16. [Project layout](#project-layout)
+17. [Design decisions](#design-decisions)
+18. [Limitations](#limitations)
+19. [Credits and licences](#credits-and-licences)
 
 ---
 
@@ -37,11 +44,37 @@ Pathlit watches Blender only when you interact with it, and walks you through a 
 - **8 built-in lessons**, starting with "Model a donut" (9 steps), then edit mode, workspaces, sculpting, lights and cameras, duplicating, object properties and render settings.
 - **It follows you.** Press the start key once, then just click in Blender. After each click Pathlit checks the step; if you did it, a pointer glides to the next target and a short line is spoken. If you are mid-step (a menu is open, a second click is still to come) it stays quiet.
 - **It checks your work.** Screen text is read by Azure Vision, and a small Blender add-on reports the mode, objects, modifiers and each object's location, rotation and scale, so "Scale Z = 1.5" is verified, not assumed.
-- **You can ask for your own task.** Type "add a monkey head and make it smooth" and Pathlit plans the steps, checks the plan, and teaches (or builds) it.
+- **You can ask for your own task.** Type "a simple house" and Pathlit plans the steps, checks the plan, and teaches (or builds) it.
 - **It can do the work.** *Show me* clicks each step while you watch. *Do it* finishes the whole task itself, under strict safety rules.
 
 The pointer is a small cursor-shaped overlay that glides between targets with easing, pulses on arrival, and fades when you click what it
 points at. The overlay and the control panel are excluded from screen capture, so their text is never read as part of Blender's screen.
+
+## Demo
+
+**Teach me.** The pointer lands on the target (here the *Mesh* item of the Add menu), a bubble says what to do, one short line is spoken,
+and the panel on the right ticks steps off as you go. Pathlit never moves your mouse in this mode.
+
+![Teach me mode](docs/images/demo_teach.jpg)
+
+**Do it.** In the mode where Pathlit clicks for you, a red border and a banner are on screen the whole time, and **Esc** stops it at once.
+
+![Do it mode with the red control border and banner](docs/images/demo_do_it.jpg)
+
+**The control panel**, in its states (a dark, quiet design in the style of shadcn/ui: a tab-style mode switch, an input with suggestions,
+a progress bar, steps that check off, and one main button showing the hotkey):
+
+| Teach me | Show me | Do it |
+|:---:|:---:|:---:|
+| ![Teach me](docs/images/panel_teach.png) | ![Show me](docs/images/panel_show.png) | ![Do it](docs/images/panel_do.png) |
+
+| Planning a typed task | Task finished | Collapsed |
+|:---:|:---:|:---:|
+| ![Planning](docs/images/panel_planning.png) | ![Done](docs/images/panel_done.png) | ![Collapsed](docs/images/panel_collapsed.png) |
+
+> **How these pictures are made.** `python scripts/make_readme_images.py` renders the real control panel and the real overlay code off-screen
+> and draws them over `tests/data/screens/blender_09.png`, a screenshot that contains only Blender. Pathlit's own screenshots are never saved,
+> and the script never captures your desktop.
 
 ## Three modes
 
@@ -51,48 +84,283 @@ points at. The overlay and the control panel are excluded from screen capture, s
 | **Show me** | Moves the real cursor to the target, waits for your OK (the start key), clicks, narrates. | no |
 | **Do it** | Does the whole task with a countdown before every action. | no |
 
-Switch modes with the buttons in the panel or the tray icon (blue = Teach me, amber = Show me, red = Do it). Show me and Do it start
+Switch modes with the tabs in the panel or the tray icon (blue = Teach me, amber = Show me, red = Do it). Show me and Do it start
 only when **you** choose them and press the start key. Esc stops everything instantly. Details in
 [the safety model](#show-me-and-do-it-the-safety-model).
 
-## How it works
+---
+
+## Architecture
+
+### The big picture
+
+Pathlit is a desktop app on your PC. Two cloud services are used for the senses (Azure reads the screen text and speaks), one for the words
+(Groq writes the short explanations and plans), and a small add-on inside Blender reports what Blender itself knows.
 
 ```mermaid
-flowchart LR
-    U([You click / press keys]) --> A[Activity listener<br/>pynput: listen only]
-    A --> C{Controller}
-    HK([Start key F8]) --> C
-    C -->|capture| S[Screen capture<br/>mss, in memory only]
-    S --> R[Azure Vision Read<br/>text + word boxes]
-    R -.->|if Azure fails| M[Mirage<br/>local, offline]
-    C -->|GET /state| B[(Blender add-on<br/>127.0.0.1)]
-    R --> T[Target matcher<br/>rapidfuzz]
-    T --> O[Overlay pointer<br/>PyQt6]
-    B --> K[Step check<br/>code, not the model]
-    R --> K
-    K -->|passed| E[Lesson engine]
-    E --> L[Teacher<br/>Groq, text only]
-    L --> V[Azure Speech]
-    E --> O
-    C -.->|Show me / Do it| X[Executor + Guard]
-    X -->|direct action| B
-    X -->|cursor click| P[pyautogui]
+flowchart TB
+    subgraph PC["Your Windows PC"]
+        direction TB
+        subgraph APP["Pathlit app (Python, PyQt6)"]
+            direction TB
+            ACT["Activity listener<br/>pynput, listen only"]
+            HK["Hotkeys<br/>start key, Esc"]
+            CTL["Controller<br/>one cycle per click"]
+            CAP["Screen capture<br/>mss, memory only"]
+            MATCH["Target matcher<br/>rapidfuzz"]
+            ENG["Lesson engine<br/>and step checks"]
+            TCH["Teacher and planner<br/>text only"]
+            OVL["Overlay<br/>pointer, bubble, banner"]
+            PNL["Control panel"]
+            AUTO["Executor and Guard<br/>Show me / Do it"]
+            SKL[("Skill map<br/>SQLite")]
+        end
+        BL["Blender 4.1<br/>with the Pathlit add-on<br/>HTTP on 127.0.0.1"]
+        MIR["Mirage<br/>local text reader, fallback"]
+        MSE["Real mouse<br/>pyautogui, loaded only when needed"]
+    end
+    subgraph AZ["Microsoft Azure"]
+        VIS["Computer Vision<br/>Image Analysis 4.0, Read"]
+        SPE["Speech<br/>neural text to speech"]
+    end
+    GRQ["Groq<br/>gpt-oss models"]
+
+    ACT --> CTL
+    HK --> CTL
+    CTL --> CAP
+    CAP -->|"JPEG of the Blender screen"| VIS
+    VIS -->|"words and boxes"| MATCH
+    CAP -.->|"if Azure fails"| MIR
+    MIR -.-> MATCH
+    CTL <-->|"GET /state, POST /do"| BL
+    MATCH --> ENG
+    BL --> ENG
+    ENG --> OVL
+    ENG --> SKL
+    ENG -->|"step text and screen words only"| TCH
+    TCH <-->|"text only"| GRQ
+    TCH --> SPE
+    SPE -->|"audio"| TCH
+    ENG --> PNL
+    CTL --> AUTO
+    AUTO -->|"direct action"| BL
+    AUTO -->|"cursor click"| MSE
 ```
 
 The idea that shapes everything: **the language model only writes words.** Code decides whether a step passed, and where the pointer
 goes. The model never sees an image and never gives coordinates; a target is named by its on-screen text and found by the screen reader.
 
-One cycle (a click in Blender, or the start key):
+### One cycle, step by step
 
-1. Capture the screen, read it with Azure Vision, and ask Blender for its state, all at once.
-2. Run the check for the step shown last (screen text, Blender state, or "you clicked the target").
-3. Pass: advance (or catch up if you ran ahead). Not yet: stay quiet, look once more a moment later, and nudge once if you stall.
-4. Find the next target's text on screen and glide the pointer to it.
-5. The teacher (Groq) writes one or two short sentences for this step; if it is unavailable, the lesson's own text is spoken.
-6. Azure Speech reads the line aloud.
+A "cycle" runs after a click in Blender (auto-advance) or when you press the start key.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as You
+    participant C as Controller
+    participant S as Screen capture
+    participant V as Azure Vision
+    participant B as Blender add-on
+    participant K as Step check
+    participant E as Lesson engine
+    participant T as Teacher (Groq)
+    participant P as Azure Speech
+    participant O as Overlay
+
+    U->>C: click in Blender (or press the start key)
+    C->>C: wait for the screen to settle (0.25 s)
+    par at the same time
+        C->>S: capture the Blender window
+        S->>V: JPEG, longest edge 2048 px
+        V-->>C: lines, words and boxes
+    and
+        C->>B: GET /state
+        B-->>C: mode, objects, modifiers, transforms
+    end
+    C->>K: run the check for the step shown last
+    alt passed
+        K-->>E: advance (or catch up if you ran ahead)
+        E->>C: next step
+        C->>C: find the next target's text on screen
+        C->>O: glide the pointer there, show the bubble
+        C->>T: step text and on-screen words (no image)
+        T-->>C: one or two short sentences
+        C->>P: speak the line
+        P-->>U: audio
+    else not yet
+        K-->>C: stay quiet, look once more a moment later
+    end
+```
 
 Measured on a saved screenshot with real Azure and Groq: the pointer is ready about **0.9 s** after a check starts, and the first spoken word
 arrives at a median of about **2.2 s** (target: 3 s).
+
+### How a step is checked (code decides, not the model)
+
+```mermaid
+flowchart LR
+    STEP["Current step"] --> KIND{"check kind"}
+    KIND -->|screen_text_present| A["Is this text on the screen<br/>(Azure Vision words)"]
+    KIND -->|blender_state| B["Mode, active object, modifier,<br/>object count, location / rotation / scale<br/>(Blender add-on)"]
+    KIND -->|clicked_target| C["Did your click land<br/>on the target's box"]
+    KIND -->|none| D["Always passes"]
+    B -. "add-on missing" .-> F["fallback_text on screen<br/>or reported as unverified"]
+    A --> R{"passed?"}
+    B --> R
+    C --> R
+    D --> R
+    R -->|yes| ADV["Advance, point at the next target"]
+    R -->|no| WAIT["Stay quiet, look again once,<br/>nudge after 20 s of silence,<br/>hint after two misses"]
+```
+
+### Show me and Do it: how an action is allowed
+
+```mermaid
+flowchart TD
+    REQ["Next action for the step"] --> MODE{"mode"}
+    MODE -->|Teach me| STOP0["Never moves anything"]
+    MODE -->|Show me or Do it| GUARD{"Guard"}
+    GUARD -->|"Esc pressed, mouse moved more than 50 px,<br/>wrong window in front, rate or count limit"| HALT["Stop and say why"]
+    GUARD -->|"clicking a dangerous label<br/>(Save, Delete, Export, Quit...)"| HALT
+    GUARD -->|allowed| KIND{"action type"}
+    KIND -->|"direct (add a torus, set Scale Z)"| ADDON["POST /do to the add-on<br/>validated again inside Blender"]
+    KIND -->|"cursor click"| MOVE["Warning pointer, countdown,<br/>move the real cursor, click"]
+    ADDON --> CHECK["Run the step check"]
+    MOVE --> CHECK
+    CHECK -->|passed| NEXT["Next step"]
+    CHECK -->|failed| HALT
+    NEXT --> LOG[("logs/actions.csv")]
+```
+
+### What leaves your computer
+
+| Data | Goes to | Why |
+|---|---|---|
+| A JPEG of the Blender window (about a second in memory, never saved) | Azure Computer Vision | reading the on-screen text |
+| One short piece of text (the step, a list of on-screen words, Blender's state) | Groq | writing the spoken line, or planning a typed task |
+| The sentence to be spoken | Azure Speech | text to speech |
+| Mouse and keyboard activity | nowhere | the listener only notes *that* you clicked, and where |
+| Blender's scene state | nowhere (localhost only) | step checks |
+| Skill map, logs, timings | nowhere | progress and measurements |
+
+### Where each part lives
+
+| Part | Module | Job |
+|---|---|---|
+| Controller | `src/pathlit/controller.py` | the cycle, auto-advance triggers (debounce, second look, idle nudge, catch-up) |
+| Perception | `src/pathlit/perception/` | `azure_vision` (primary), `mirage_reader` (local fallback), `router`, `target_match` |
+| Lessons | `src/pathlit/lessons/` | JSON loader (pydantic), step engine, code-decided checks |
+| Brain | `src/pathlit/brain/` | `teacher`, `planner`, `builder` (exact numbers), `vocabulary`, `docs_search` |
+| Control | `src/pathlit/control/` | allow-list, `guard`, mouse, `executor` (Show me / Do it) |
+| Overlay | `src/pathlit/overlay/` | pointer, bubble, banner, exclusion from capture |
+| Panel | `src/pathlit/ui/panel.py` | the control panel |
+| Voice | `src/pathlit/voice.py` | Azure Speech |
+| Blender add-on | `blender_addon/pathlit_bridge/` | read-only state, allow-listed `POST /do` |
+
+---
+
+## How Pathlit uses Azure
+
+Pathlit uses two Azure AI services in production (**Computer Vision** for reading the screen and **Speech** for the voice), has code for a
+third (**AI Search**, optional and not deployed), and could not use a fourth (**Azure OpenAI**). Here is each one, what it does, and why.
+
+| Service | Azure resource | Used for | Where in the code | `.env` keys | Tier | If it fails |
+|---|---|---|---|---|---|---|
+| **Computer Vision** (Image Analysis 4.0, Read) | Computer Vision | reading every word on the Blender screen, with boxes | `perception/azure_vision.py` | `AZURE_VISION_ENDPOINT`, `AZURE_VISION_KEY` | Free (F0), East Asia | falls back to local Mirage |
+| **Speech** (neural text to speech) | Speech | the spoken line (voice `en-US-JennyNeural`) | `voice.py` | `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | Free (F0), East Asia | the line is shown, not spoken |
+| **AI Search** (optional) | Azure AI Search | Blender manual excerpts for the teacher | `brain/docs_search.py`, `scripts/build_docs_index.py` | `AZURE_SEARCH_*` | **not deployed** (cost) | the teacher uses the lesson text only |
+| **Azure OpenAI** | none | would have been the teacher | `.env` keys left empty | `AZURE_OPENAI_*` | **unavailable** on the student subscription | Groq is used instead |
+
+### 1. Azure Computer Vision: how the screen becomes "targets"
+
+Pathlit needs to know **where the words are**, because a target in a lesson is named by its text ("Mesh", "Subdivision Surface"), not by a
+pixel coordinate. Azure's **Read** feature (OCR in Image Analysis 4.0, SDK `azure-ai-vision-imageanalysis`) does this well on Blender's
+dense, small-font interface.
+
+```mermaid
+flowchart LR
+    A["Screenshot<br/>mss, DPI-aware, memory only"] --> B["Downscale to 2048 px<br/>longest edge, remember the factor"]
+    B --> C["JPEG, quality 85"]
+    C --> D["ImageAnalysisClient.analyze<br/>VisualFeatures.READ"]
+    D --> E["blocks, lines, words<br/>with polygons and confidence"]
+    E --> F["report_from_result<br/>polygons to boxes, scaled back<br/>to real screen pixels"]
+    F --> G["ScreenReport<br/>list of Element: text, box, confidence"]
+    G --> H["target_match<br/>rapidfuzz, standalone-label preference,<br/>nearest to the previous target"]
+    H --> I["Pointer position"]
+    G --> J["screen_text_present checks"]
+    G --> K["words given to the teacher<br/>as text"]
+```
+
+- **What is sent:** one JPEG of the Blender window, quality 85, longest edge 2048 px. Measured against the full-size PNG: a 4x smaller upload,
+  a read in about **0.9 s instead of 1.7 s**, and the same 16 of 16 test targets found. Nothing is stored by Pathlit; the image exists in memory for about a second.
+- **What comes back:** blocks, then lines, then words, each with a bounding polygon and a confidence. Pathlit turns each line and each word into an
+  `Element` (text, box in real pixels, confidence). Words let it point at one item of a line; lines let it match multi-word labels
+  ("Subdivision Surface").
+- **Matching a target:** a lesson step says `target_text: "Mesh"`. The matcher does fuzzy matching (rapidfuzz), ignores noise tokens shorter than
+  3 letters, prefers a **standalone** label over the same word inside a longer one ("Object" the menu, not "Object Mode"), and prefers the match
+  **nearest the previous target** ("Camera" in the open Add menu, not the Camera object in the Outliner).
+- **Why Azure first, and a local fallback second.** The first plan was local-first with Mirage. Measured on 10 real Blender screens:
+
+  | Reader | Text lines found per screen | Target words located |
+  |---|---|---|
+  | Azure Vision Read | 94 to 128 | the primary reader (16 of 16 test targets) |
+  | Mirage (local) | 11 to 30 | 2 of 100 |
+
+  So the order was reversed. Mirage stays as the offline fallback: if Azure is unreachable or rate-limited, the `Router` switches to it and the lesson carries on.
+- **Warm-up and limits.** The first call is slow, so a blank image is sent at start-up. The free tier allows about 20 calls a minute, which is why
+  auto-advance debounces clicks (0.25 s), takes one second look, and never polls on a timer.
+- **Cost of a lesson.** Roughly one call per click, so a 9-step donut lesson is about 10 to 20 calls, well inside the free tier.
+
+### 2. Azure Speech: the voice
+
+Text to speech with the neural voice `en-US-JennyNeural` (SDK `azure-cognitiveservices-speech`).
+
+- One synthesizer and one connection are kept **warm**, and audio **streams to the speaker as it is produced**, so the first word is heard at a
+  median of about 2.2 s after a check starts (screen read, Blender state, the teacher's sentence and the first audio chunk all included).
+- Lines are capped at two sentences, about 30 words, so the voice never reads a paragraph.
+- **Esc** stops speech immediately (`stop_speaking_async`).
+- If Speech fails the lesson continues in silence and the bubble still shows the line.
+
+### 3. Azure AI Search (optional, not deployed)
+
+The code, the index builder (`scripts/build_docs_index.py`) and the manual downloader (`scripts/fetch_manual.py`) exist and are tested with fakes. The idea is
+to give the teacher two or three excerpts of the Blender manual (CC BY-SA 4.0) so its explanation is grounded in documentation.
+**No Search resource exists**: its default paid tier was estimated at about **$250 a month**, which is far beyond a student project. Pathlit runs fine without it.
+A local search over the downloaded manual would be the zero-cost alternative (listed under [Project status](#project-status)).
+
+> **Warning for anyone setting this up:** do not create Azure AI Search on a paid tier by accident. It is optional.
+
+### 4. Azure OpenAI (not used) and why Groq is the teacher
+
+The original design used Azure OpenAI for the teacher. On the student subscription, deployments failed in every allowed region ("unsupported region", then a
+policy block, `RequestDisallowedByAzure`), and non-OpenAI catalogue models were not deployable either. The teacher is therefore **Groq** (`openai/gpt-oss-120b` for
+planning, `openai/gpt-oss-20b` for the spoken lines), behind a small interface (`brain/teacher.py`) that also supports "no model": lessons then speak their own text.
+Groq receives **text only**. Moving back to Azure OpenAI later needs only a new client behind the same interface.
+
+### 5. Setting the Azure resources up
+
+1. Create one resource group (for example `pathlit-rg`).
+2. Create a **Computer Vision** resource and a **Speech** resource, both on the **Free F0** tier. Student subscriptions often allow only some regions;
+   **East Asia** worked in development. The create form tells you if a region is blocked.
+3. Open each resource, then *Keys and Endpoint*, and copy the endpoint, key and region into `.env`
+   (names in the table above; never commit `.env`).
+4. Run `pathlit setup`. It makes one real test call to each service and tells you what, if anything, is wrong.
+5. Keys are secrets. If one is ever shown in a screenshot or log, regenerate it in the portal and update `.env`.
+
+### 6. Responsible-AI and AI-901 view
+
+| Topic | How Pathlit handles it |
+|---|---|
+| Computer vision (OCR) | Azure Read finds text and its position; the app never asks a model to guess pixel coordinates |
+| Speech (synthesis) | neural voice, streaming, stoppable at any moment |
+| Generative AI | a small model writes short text only; code verifies everything that matters (pass or fail, positions, actions) |
+| Transparency | the pointer says what it will do; a red border and banner show whenever it controls the mouse |
+| Privacy and security | screenshots are never saved; keys in `.env`; Groq gets text only; allow-listed actions only |
+| Reliability | every Azure call has a fallback (Mirage, silence, lesson text) and the lesson never stops because a service failed |
+| Inclusiveness | spoken and written instructions together; limits are documented under [Limitations](#limitations) |
+
+---
 
 ## Quick start
 
@@ -122,16 +390,8 @@ copy .env.example .env      # fill in the values; never commit .env
 .venv\Scripts\python scripts\run.py
 ```
 
-### Setting up Azure (about 15 minutes)
-
-1. Create a resource group, then a **Computer Vision** resource and a **Speech** resource on the **Free F0** tier. Student subscriptions
-   often allow only some regions (East Asia worked in development); the create form tells you if a region is blocked.
-2. Copy each resource's endpoint, key and region into `.env`.
-3. Get a free Groq key at console.groq.com and put it in `.env`.
-4. Run `pathlit setup`, which makes one test call to each service.
-
-> **Do not create Azure AI Search on a paid tier by mistake.** Its default tier costs hundreds of dollars a month. It is optional here
-> (it only adds manual excerpts), and Pathlit runs fine without it.
+The Azure side is explained step by step in [Setting the Azure resources up](#5-setting-the-azure-resources-up). Get a free Groq key at
+console.groq.com and put it in `.env` as `GROQ_API_KEY`.
 
 ## Configuration
 
@@ -143,7 +403,7 @@ copy .env.example .env      # fill in the values; never commit .env
 | `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | the spoken voice |
 | `GROQ_API_KEY`, `GROQ_MODEL`, `GROQ_MODEL_SMALL` | the teacher and the planner (`openai/gpt-oss-120b` and `-20b`) |
 | `AZURE_SEARCH_*` | optional manual excerpts |
-| `AZURE_OPENAI_*` | not used (see [Design decisions](#design-decisions)) |
+| `AZURE_OPENAI_*` | not used (see [Azure OpenAI](#4-azure-openai-not-used-and-why-groq-is-the-teacher)) |
 | `DEBUG_SAVE_SCREENS` | keep `false`; screenshots are never written to disk otherwise |
 
 `settings.yaml` (every value is commented in the file):
@@ -159,11 +419,14 @@ copy .env.example .env      # fill in the values; never commit .env
 
 ## Using Pathlit
 
-1. Start it. A small control panel opens and the terminal prints a status banner (lessons, Blender link, add-on version, teacher, auto-advance).
-2. Press **F8** (or the panel button) to start the next lesson. Pathlit announces it and points at the first target.
+1. Start it. The control panel opens (top right of the screen; drag it by its header, collapse it with the chevron) and the terminal prints a status banner (lessons, Blender link, add-on version, teacher, auto-advance).
+2. Press **F8** (or the main button) to start the next lesson. Pathlit announces it and points at the first target.
 3. Do the step. The pointer fades when you click it, then glides to the next one. Wrong click or an open menu? Silence, not scolding.
 4. Stalled for about 20 seconds? It explains the step once. **F8** at any time means "check me now"; after two misses you get a hint.
-5. The panel lists every step: ✓ done, ▶ current, ○ upcoming.
+5. The panel lists every step: a filled check for done, a ringed dot for the current one, a numbered circle for the ones to come, and a thin bar for progress.
+
+**In the panel:** type a task and press **Enter** (or the arrow button); click a suggestion ("a coffee mug", "a simple house", "a donut") to plan it at
+once; **Up** recalls your last task and **Esc** clears the box; hover a step to see its full text; the status line at the bottom explains what Pathlit is doing.
 
 Lessons: *Model a donut*, *Switch between Object and Edit mode*, *Move between workspaces*, *Your first look at Sculpt mode*,
 *Add a light and a camera*, *Duplicate and delete objects*, *Read the Object properties*, *Find the render settings*. They are plain JSON in
@@ -172,7 +435,7 @@ line, and a check.
 
 ## Typed tasks ("build a house")
 
-Type a goal in the panel and click **Plan steps**. Pathlit asks the model for a build plan, **checks it with code**, and queues it.
+Type a goal in the panel. Pathlit asks the model for a build plan, **checks it with code**, and queues it.
 
 A plan is a list of parts, each with a shape and exact numbers:
 
@@ -239,11 +502,11 @@ the cursor, except for steps a cursor cannot do (typing numbers), which it perfo
 ## Testing and evaluation
 
 ```
-pathlit test fast      # about 260 offline tests, around 90 seconds
+pathlit test fast      # about 270 offline tests, around 90 seconds
 pathlit test           # also the live tests, which call Azure on real Blender screenshots (needs your keys)
 ```
 
-Tests are named by requirement (`test_fr8_wrong_action_does_not_advance...`). No test moves a real mouse; cursor control is tested with fakes,
+Tests are named by requirement (`test_fr8_wrong_action_does_not_advance...`, `test_srs4_panel_...`). No test moves a real mouse; cursor control is tested with fakes,
 and the add-on's actions were also verified in a real Blender 4.1.
 
 The Phase 3 evaluation (pointing accuracy for Mirage vs Azure Vision vs a router, step-check accuracy, a user test) has its tools built and
@@ -262,7 +525,7 @@ The protocol for the classmate user test is in [`docs/user_test_sheet.md`](docs/
 
 **Working:** the 8 lessons, auto-advance, the step checks, the pointer overlay, the spoken lines, the Blender add-on (state and allow-listed actions),
 typed-task planning with the geometry self-check, Show me (confirmed to move and click on a real machine), Do it (built and tested with fakes and the
-add-on's actions verified in a real Blender), the tray and panel, the one-word launcher.
+add-on's actions verified in a real Blender), the tray and the redesigned panel, the one-word launcher.
 
 **Measured** (during development, on saved screenshots, real services):
 
@@ -294,6 +557,7 @@ Every finding, decision, bug and open question is written down in [`docs/questio
 | "The free model is busy" | Groq's free tier allows 8,000 tokens a minute for the planner model. Pathlit waits as long as Groq asks (up to 30 s) and retries once. |
 | `.env` missing keys | `pathlit doctor` lists them (names only, never values). |
 | The pointer lands on the wrong item | The same word can appear in several places. Pathlit prefers a standalone label, then the match nearest the previous target. Check `logs/session.csv` (`candidates` column). |
+| The panel text looks different from the pictures | The panel prefers the Inter font and falls back to Segoe UI. Install Inter for the exact look. |
 
 ## Project layout
 
@@ -316,9 +580,9 @@ src/pathlit/
   evaluation.py capture_plan.py   Phase 3 evaluation logic
 blender_addon/         the Blender add-on (state, allow-listed actions) and its autoload script
 lessons/blender/       the 8 lessons (JSON)
-scripts/               run, install the add-on, spikes, evaluation, data collection, labelling
-tests/                 about 260 offline tests plus live tests
-docs/                  questions.md (findings and decisions), results.md, do_mode.md, demo script, user-test sheet
+scripts/               run, install the add-on, spikes, evaluation, data collection, labelling, make_readme_images
+tests/                 about 270 offline tests plus live tests
+docs/                  questions.md, results.md, do_mode.md, demo script, user-test sheet, images/ (README pictures)
 ```
 
 ## Design decisions
@@ -330,6 +594,7 @@ docs/                  questions.md (findings and decisions), results.md, do_mod
 - **Checks that cannot pass early.** A first-step screen check must not already be true on the untouched layout (this caught a real bug in lesson 5, where "Light" is also an object in the Outliner).
 - **Nearest-to-the-last-target matching** and **standalone-label preference** fix the "same word in two places" problem (the Object menu vs the word in "Object Mode"; the Add menu's Camera vs the Camera object in the Outliner).
 - **The Blender add-on re-validates everything.** The app checks every action, and the add-on checks it again, because it is the part that changes the scene.
+- **A quiet, neutral panel.** The control panel uses a zinc palette, 1 px borders and one white primary button, so the colour on screen belongs to Blender and to the pointer.
 
 ## Limitations
 
@@ -342,6 +607,7 @@ docs/                  questions.md (findings and decisions), results.md, do_mod
 ## Credits and licences
 
 - Blender manual excerpts (an optional index; the manual pages are downloaded locally and are **not** in this repository): Blender Documentation Team, CC BY-SA 4.0.
+- The Blender screenshot behind the demo pictures shows Blender 4.1 (GPL), used only to illustrate the app.
 - [Mirage](https://cactuscompute.com) (local text reader): Cactus Compute, Apache 2.0. Azure Vision, Speech and Search: Microsoft. Teacher and planner model: Groq (`openai/gpt-oss`).
 - PyQt6, pynput, pyautogui, mss, rapidfuzz, pydantic, pandas, matplotlib and the other packages in `requirements.txt` keep their own licences.
 - **Project licence: not chosen yet.** Until a `LICENSE` file is added, all rights are reserved by the author.
